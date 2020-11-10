@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pong</title>
+  <script>
+    var x=200,y=100; // ボールの初期位置
+    var dx=10,dy=10; // ボールのスピード
+    var rx=200; //ラケット位置
+    var BallN=3, Point=0, Level=100; //100ms timer
+    var TimeId;
+    
+    function racket(event) {
+        var bar=document.getElementById("bar");
+        rx=event.clientX-25;
+        if (50<=rx && rx+50<=450)
+          bar.style.left=rx + "px";
+    }  
+  
+    function init() {
+        var ball=document.getElementById("ball");
+        x=parseInt((Math.random()*300)/10)*10+60;
+        y=parseInt((Math.random()*30)/10)*10+60;
+        ball.style.left=x;
+        ball.style.top=y;
+        ball.style.visibility="visible";
+        move();
+    }
+    
+    function move() {
+        clearTimeout(TimeId);
+        TimeId=setTimeout("move()", Level);
+        var ball=document.getElementById("ball");
+        x+=dx; y+=dy;
+        ball.style.left= x + "px";
+        ball.style.top= y + "px";
+      
+        if (x<=50 || x+10>=450){
+          dx=-dx;
+          document.getElementById("wsound").play();//壁で音を出す
+        }
+        if (y<=50 || y+10>=450) {
+          dy=-dy;
+          document.getElementById("wsound").play();//壁で音を出す
+        }
+        if (rx-10<=x && x<=rx+50 && y+10==400) {
+          dy=-dy;
+          Point=Point+10;//ポイントを加算
+          document.getElementById("rsound").play();
+          document.getElementById("PointMsg").value=Point+"点";
+          
+    }
+    //ボールがラケットを通り過ぎた
+    if(y>420){
+      BallN--; //ミスったからボールの数を減らす
+      document.getElementById("BallMsg").value="残り" + BallN + "個";
+      ball.style.visibility="hidden";
+      clearTimeout(TimeId);
+      if(BallN > 0) setTimeout("init()",2000);
+      else { //ボールがゼロで、ゲームオーバー
+        document.getElementById("tryagain").style.visibility="visible";
+      }
+    }
+}
+  </script>
+</head>  
+<body onmousemove="racket(event)">
+  <form style="position:absolute;left:160px;top:20px">
+    <input id="BallMsg" type="text" size="10px" value="残り3個">
+    <input id="PointMsg" type="text" size="10px" value="0点">
+    <select onchange="speed(this)">
+      <option value="100">初級</option>
+      <option value="50">中級</option>
+      <option value="25">上級</option>
+    </select>
+  </form>
+  <img src="https://cdn.glitch.com/b5b0b844-f400-47f5-bcc8-4a3dea50aebe%2Fwall.png?v=1603408388695"
+       style="position:absolute;left:46px;top:46px">
+  <img src="https://cdn.glitch.com/b5b0b844-f400-47f5-bcc8-4a3dea50aebe%2Fball.png?v=1603408402990"
+       style="position:absolute;left:300px; top:100px" id="ball" >
+  <img src="https://cdn.glitch.com/b5b0b844-f400-47f5-bcc8-4a3dea50aebe%2Fbar.png?v=1603408398458"
+       style="position:absolute;left:200px;top:400px" id="bar" onclick="init()">
+<!-- オーディオファイル -->
+<audio id ="rsound"preload="auto">
+  <source type="audio/mp3"
+          src="https://cdn.glitch.com/cd74d552-462e-4c0b-b2ad-f4c3cb224d70%2Fracketsound.mp3?v=1604563375036">
+  </audio>
+<audio id ="wsound"preload="auto">
+  <source type="audio/mp3"
+          src="https://cdn.glitch.com/cd74d552-462e-4c0b-b2ad-f4c3cb224d70%2Fpon.m4a?v=1604563407386">
+  </audio>
+<audio id ="start"preload="auto">
+  <source type="audio/mp3"
+          src="https://cdn.glitch.com/cd74d552-462e-4c0b-b2ad-f4c3cb224d70%2Fpapparapa.m4a?v=1604563433243">
+  </audio>
+
+<!--ゲームオーバー　メッセージ -->
+<div id="tryagain" style="position:absolute;left:200px;top:225px;visibility:hidden">
+  GAME OVER!!
+  </div>
+</body>
+</html>
